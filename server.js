@@ -3,14 +3,30 @@ const app = express();
 const { users, projects, ROLE } = require('./data')
 const {authUser, authRole} = require('./Auth');
 const projectsRouter = require('./routes/projects');
+const mysql  = require('mysql2')
 
 app.use(express.json());
 app.use(setUser);
 app.use('/projects', projectsRouter);
 
+const database = mysql.createConnection({
+    host: 'database-1.c1suigess9hp.us-east-1.rds.amazonaws.com',
+    user: 'admin', 
+    password: 'password',
+});
+
+database.connect((err) => {
+    if (err) {
+      console.error('Error connecting to the database:', err);
+      return;
+    }
+    console.log('Connected to the database successfully');
+});
+
 app.get('/', (req, res) => {
     res.send('Home Page');
 })
+
 // authUser in auth.js
 app.get('/dashboard', authUser, (req, res) => {
     res.send('dashboard');
@@ -32,4 +48,7 @@ function setUser(req, res, next) {
     next();
 }  
 
-app.listen(3000);
+app.listen(3000, () => {
+    console.log('Server is running on port 3000')
+})
+    
