@@ -22,6 +22,14 @@ function authRole(role) {
     }
 }
 
+  
+//   app.get('/users',(req,res)=> {
+//       const sql = "SELECT * from cats";
+//       db.query(sql, (error, data) => {
+//           if (error) return res.json(error);
+//           return res.json(data);
+//   })
+//   })
 
 module.exports = {
     authUser,
