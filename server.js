@@ -15,7 +15,7 @@ app.get('/', (req, res) => {
 })
 
 app.get('/login', (req, res) => {
-    res.send('Home Page');
+    res.send('Login');
 })
 
 // authUser in auth.js
@@ -57,10 +57,10 @@ function setUser(req, res, next) {
 
 
 // validates login information from database and then sends user to dashboard or admin page
- 
+ // login page, staff, dev, admin, page
 app.post('/login', (req, res) => {
     const { username, password } = req.body;
-    pool.query('SELECT * FROM users', [username], async (error, results) => {
+    pool.query('SELECT * FROM staff', [username], async (error, results) => {
       if (error) {
         throw error;
       }
@@ -69,22 +69,27 @@ app.post('/login', (req, res) => {
         if (await bcrypt.compare(password, user.password)) {
           req.userId = user.id && req.isAdmin !== user.isadmin;
           res.send('Logged in!');
-          res.redirect('/dashboard');
+          console.log('logged in');
+          // create another function that redirects then
+          // res.send json to make sure it is working, if it is function that redirects after response is recieved
+        //   res.redirect('/dashboard');
         } else  if (await bcrypt.compare(password, user.password)) {
             req.userId = user.id && req.isAdmin == user.isadmin;
             res.send('Logged in!');
-            res.redirect('/dashboardAdmin');
+            console.log('logged in');
         }
        else {
           res.send('Username or password is incorrect');
+          console.log('not working');
         }
       } else {
         res.send('Username does not exist');
+        console.log('Username does not exist');
       }
     });
   });  
+// erick posts that login info to a  server, then fetch from server, then run query to validate login info
+// req.session.userId = user.id;
+//   req.session.isAdmin = user.isadmin;
 
-   //   req.session.userId = user.id;
- //   req.session.isAdmin = user.isadmin;
-
-app.listen(3000);
+app.listen(3001);
