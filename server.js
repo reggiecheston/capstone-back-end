@@ -7,17 +7,21 @@ const mysql2 = require('mysql2');
 const bcrypt = require('bcrypt');
 
 app.use(express.json());
-app.use(setUser);
+// app.use(setUser);
 app.use('/projects', projectsRouter);
 const cors = require('cors');
 
 
 app.use(cors());
 
+app.get('/', (req, res) => {
+    res.send('Home Page');
+})
 const database = mysql2.createConnection({
     host: 'database-1.c1suigess9hp.us-east-1.rds.amazonaws.com',
     user: 'admin', 
     password: 'password',
+    database: 'capstone_team_3'
 });
 
 database.connect((err) => {
@@ -28,71 +32,105 @@ database.connect((err) => {
     console.log('Connected to the database successfully');
 });
 
-app.get('/', (req, res) => {
-    res.send('Home Page');
-})
 
-app.get('/login', (req, res) => {
+app.get('/login', (req, res, next) => {
     res.send('TEST TEST');
 })
 
-
-// authUser in auth.js
-app.get('/dashboard', authUser, (req, res) => {
-    res.send('dashboard');
+app.get('/staff', (req, res) => {
+    res.send('users');
+})
+app.get('/dev', (req, res) => {
+    res.send('users');
 })
 
-app.get('/dashboardAdmin', authUser, authRole(ROLE.ADMIN), 
+// authUser in auth.js
+
+
+app.get('/admin', authUser, authRole(ROLE.ADMIN), 
 (req, res) => {
     res.send('admin page');
 })
 
+
+
 // middleware to set user
 // set user based on user.id from data inside of data.js
 
-function setUser(req, res, next) {
-    const userId = req.body.userId;
-    if (userId) {
-        req.user = users.find(user => user.id === userId);
-    }
-    next();
-}
+// function setUser(req, res, next) {
+//     const userId = req.body.userId;
+//     if (userId) {
+//         req.user = users.find(user => user.id === userId);
+//     }
+//     next();
+// }
 // are you guys hashing passwords in database
-function loginUser(username, password) {
-  return new Promise((resolve, reject) => {
-      pool.query('SELECT * FROM users WHERE username = $1', [username], async (error, results) => {
-          if (error) {
-              reject(error);
-          }
-          if (results.rows.length > 0) {
-              const user = results.rows[0];
-              if (await bcrypt.compare(password, user.password)) {
-                  resolve({ userId: user.id, isAdmin: user.isadmin });
-              } else {
-                  reject('Username or password is incorrect');
-              }
-          } else {
-              reject('Username does not exist');
-          }
-      });
-  });
-}
+// function loginUser(email, password) {
+//   return new Promise((resolve, reject) => {
+//       database.query('SELECT * FROM staff WHERE email = ="${req.body.email}" and password= "${req.body.password}"', [email], async (error, results) => {
+//           if (error) {
+//               reject(error);
+//           }
+//           if (results.rows.length > 0) {
+//               const user = results.rows[0];
+//               if (await compare(password, user.password)) {
+//                   resolve({ userId: user.id, isAdmin: user.isadmin });
+//               } else {
+//                   reject('email or password is incorrect');
+//               }
+//           } else {
+//               reject('email does not exist');
+//           }
+//       });
+//   });
+// }
+
+// insde post request , run sql query 
+// have sql that checks if login is correct
+// then if hashed correctly, do inside post itself
+// write query then do validation
+// do res.send then send back is admin or not , user id , etc
+// then front end grab 
 
 
-app.post('/login', async (req, res) => {
-  const { username, password } = req.body;
-  try {
-      const user = await loginUser(username, password);
-      req.userId = user.userId;
-      req.isAdmin = user.isAdmin;
-      res.send('Logged in!');
-      console.log('logged in');
-      res.redirect(req.isAdmin ? '/dashboardAdmin' : '/dashboard');
-  } catch (error) {
-      res.send(error);
+app.post("/login", async (req, res, next) => {
+    console.log(req.body);
+    const email = req.body.email
+    const password = req.body.password;
+    try {
+        const sql = `SELECT * FROM staff WHERE email = "${req.body.email}" and user_password = "${req.body.password}"`;
+        database.query(sql, [req.body.email], async (error, result) => {
+    
+            if (error) {
+                throw error;
+            }
+            if (result.length > 0) {
+                const email = req.body.email
+                const password = req.body.password;
+                // req.userId = user.userId;
+                // req.isAdmin = user.isAdmin;
+                res.send({ message: "Logged in!", user: result });
+                console.log('logged in');
+                const role = `SELECT admin_id, developer_id FROM staff WHERE email = "${email}"`;
+  if (res.ok) {
+    console.log(res)
+    const data = await res.json();
+    if (res.body.admin_id) {
+      navigate('/Admin');
+    } else {
+      navigate('/dashboard');
+    }
   }
-});
 
+            } else {
+                res.send({ message: "Invalid email or password" });
+              
+            }
+        });
+    } catch (error) {
+        res.status(500).send({ error: "hi ):" });
+    }
+});
 
 
    //   req.session.userId = user.id;
@@ -102,6 +140,6 @@ app.listen(4000, ()  => {
     console.log('Server is listening on port 4000.')
 });
 
-module.exports = loginUser;
+// module.exports = loginUser;
 
 // all 3 queries need to be run one after another
