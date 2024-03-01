@@ -14,6 +14,7 @@ const database = mysql2.createConnection({
     host: 'database-1.c1suigess9hp.us-east-1.rds.amazonaws.com',
     user: 'admin', 
     password: 'password',
+    databsase: 'capstone_team_3'
 });
 
 database.connect((err) => {
@@ -54,35 +55,35 @@ function setUser(req, res, next) {
     next();
 }
 
-app.post('/login', (req, res) => {
-    const { username, password } = req.body;
-    pool.query('SELECT * FROM users', [username], async (error, results) => {
-      if (error) {
-        throw error;
-      }
-      if (results.rows.length > 0) {
-        const user = results.rows[0];
-        if (await bcrypt.compare(password, user.password)) {
-          req.userId = user.id && req.isAdmin !== user.isadmin;
-          res.send('Logged in!');
-          res.redirect('/dashboard');
-        } else  if (await bcrypt.compare(password, user.password)) {
-            req.userId = user.id && req.isAdmin == user.isadmin;
-            res.send('Logged in!');
-            res.redirect('/dashboardAdmin');
-        }
-       else {
-          res.send('Username or password is incorrect');
-        }
-      } else {
-        res.send('Username does not exist');
-      }
-    });
-  });  
-
+app.post("/login", async (req, res, next) => {
+  console.log(req.body);
+  const email = req.body.email
+  const password = req.body.password;
+  try {
+      const sql = `SELECT * FROM staff WHERE email ="${req.body.email}" and password= "${req.body.password}"`;
+      database.query(sql, [req.body.email], async (error, result) => {
+          if (error) {
+              throw error;
+          }
+          if (result.length > 0) {
+              const email = req.body.email
+              const password = req.body.password;
+              req.userId = user.userId;
+              req.isAdmin = user.isAdmin;
+              res.send({ message: "Logged in!", user: result[0] });
+              console.log('logged in');
+              res.redirect(req.isAdmin ? '/dashboardAdmin' : '/dashboard');
+          } else {
+              res.send({ message: "Invalid email or password" });
+          }
+      });
+  } catch (error) {
+      res.status(500).send({ error: "hi ):" });
+  }
+});
    //   req.session.userId = user.id;
  //   req.session.isAdmin = user.isadmin;
 
-app.listen(3000, ()  => {
-    console.log('Server is listening on port 3000.')
+app.listen(4000, ()  => {
+    console.log('Server is listening on port 4000.')
 });
