@@ -22,7 +22,7 @@ function authRole(role) {
     }
 }
 
-  
+
 //   app.get('/users',(req,res)=> {
 //       const sql = "SELECT * from cats";
 //       db.query(sql, (error, data) => {
