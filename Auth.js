@@ -1,12 +1,12 @@
 
 // only logged in user can access page
 function authUser(req, res, next) {
-    // if user is not logged in, send 403 status code and message
-  if (req.user == null) {
-    res.status(403)
-    return res.send('Please sign in')
-  }
-  next()
+    if (res.body.admin_id) {
+
+        next(); // User is logged in, so continue to the next middleware
+    } else {
+        res.status(401).send('Unauthorized'); // User is not logged in, send Unauthorized response
+    }
 }
 
 // authenticating role
