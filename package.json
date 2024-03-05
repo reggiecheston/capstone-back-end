@@ -5,10 +5,8 @@
   "main": "data.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
-  },
-  "build": {
-    "commands": "npm run build"
+    "start": "node server.js",
+    "build": "npm run build"
   },
   "author": "",
   "license": "ISC",
