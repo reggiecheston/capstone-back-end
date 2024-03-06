@@ -3,32 +3,30 @@ const app = express();
 const { users, projects, ROLE } = require("./data");
 const { authUser, authRole } = require("./Auth");
 const projectsRouter = require("./routes/projects");
-const mysql2 = require("mysql2");
+const mysql2 = require("mysql2/promise");
 const bcrypt = require("bcrypt");
- 
+
+require('dotenv').config();
+const database = mysql2.createConnection({
+  host: process.env.database_HOST,
+  user: process.env.database_USER,
+  password: process.env.database_PASSWORD,
+  database: process.env.databse_NAME,
+  waitForConnections: true,
+});
+
+app.use((req, res, next) => {
+  req.database = pool;
+  next();
+});
+
 app.use(express.json());
-// app.use(setUser);
 app.use("/projects", projectsRouter);
 const cors = require("cors");
- 
 app.use(cors());
  
 app.get("/", (req, res) => {
   res.send("Home Page");
-});
-const database = mysql2.createConnection({
-  host: "database-1.c1suigess9hp.us-east-1.rds.amazonaws.com",
-  user: "admin",
-  password: "password",
-  database: "capstone_team_3",
-});
- 
-database.connect((err) => {
-  if (err) {
-    console.error("Error connecting to the database:", err);
-    return;
-  }
-  console.log("Connected to the database successfully");
 });
  
 app.get("/login", (req, res, next) => {
@@ -42,12 +40,9 @@ app.get("/dev", (req, res) => {
   res.send("users");
 });
  
-// authUser in auth.js
- 
 app.get("/admin", authUser, authRole(ROLE.ADMIN), (req, res) => {
   res.send("admin page");
 });
- 
  
 app.post("/login", async (req, res, next) => {
   console.log(req.body);
@@ -62,8 +57,6 @@ app.post("/login", async (req, res, next) => {
       if (result.length > 0) {
         const email = req.body.email;
         const password = req.body.password;
-        // req.userId = user.userId;
-        // req.isAdmin = user.isAdmin;
         res.send({ message: "Logged in!", user: result });
         console.log("logged in");
         const role = `SELECT admin_id, developer_id FROM staff WHERE email = "${email}"`;
@@ -84,9 +77,6 @@ app.post("/login", async (req, res, next) => {
     res.status(500).send({ error: "hi ):" });
   }
 });
- 
-//Need to add staff POST
- 
 
 app.post("/staff", async (req, res, next) => {
   console.log(req.body);
@@ -128,8 +118,4 @@ if (res.ok) {
 app.listen(4000, () => {
   console.log("Server is listening on port 4000.");
 });
- 
-// module.exports = loginUser;
- 
-// all 3 queries need to be run one after another
  
