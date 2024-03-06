@@ -5,6 +5,7 @@ const { authUser, authRole } = require("./Auth");
 const projectsRouter = require("./routes/projects");
 const mysql2 = require("mysql2");
 const bcrypt = require("bcrypt");
+const axios = require("axios");
  
 app.use(express.json());
 // app.use(setUser);
@@ -35,6 +36,11 @@ app.get("/login", (req, res, next) => {
   res.send("TEST TEST");
 });
  
+app.get("/data", (req, res, next) => {
+  res.send("TEST TEST");
+});
+
+
 app.get("/staff", (req, res) => {
   res.send("users");
 });
@@ -44,7 +50,7 @@ app.get("/dev", (req, res) => {
  
 // authUser in auth.js
  
-app.get("/admin", authUser, authRole(ROLE.ADMIN), (req, res) => {
+app.get("/admin", (req, res) => {
   res.send("admin page");
 });
  
@@ -90,7 +96,7 @@ app.post("/login", async (req, res, next) => {
 
 app.post("/staff", async (req, res, next) => {
   console.log(req.body);
-  const title = req.body.title
+  const title = req.body.title;
   const summary = req.body.summary;
   const category = req.body.category.trim();
   const priority = req.body.priority;
@@ -111,10 +117,10 @@ app.post("/staff", async (req, res, next) => {
               console.log('report submitted');
 
               
-if (res.ok) {
-  console.log(res)
-  const data = await res.json();
-}
+              if (res.ok) {
+                console.log(res)
+                const data = await res.json();
+              }
           } else {
               res.send({ message: "Could not send report" });
             
@@ -132,4 +138,17 @@ app.listen(4000, () => {
 // module.exports = loginUser;
  
 // all 3 queries need to be run one after another
- 
+
+
+
+app.post('/admin', (req, res) => {
+  const sql = `SELECT * FROM tickets`;
+  database.query(sql, (error, result) => {
+    if (error) {
+      console.error(`Error fetching data: ${error}`);
+      res.status(500).send('Error fetching data from database');
+    } else {
+      res.json(result);
+    }
+  });
+});
