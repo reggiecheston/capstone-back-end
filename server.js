@@ -212,7 +212,7 @@ app.post('/tickets', (req, res) => {
   });
 });
 
-app.get("/ticket", (req, res) => {
+app.get("/tickets", (req, res) => {
   fetchTicketData((error, ticketData) => {
     if (error) {
       res.status(500).send('Error fetching data from database');
