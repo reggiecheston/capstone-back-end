@@ -5,7 +5,7 @@ Welcome to our Ticket Submission and Management App! This application is designe
 ## Setup Instructions
 
 1. Clone the repository to your local machine.
-[git@github.com:reggiecheston/capstone-back-end.git](Code Beetle/ Back-End Repo)
+git@github.com:reggiecheston/capstone-back-end.git
 
 2. Navigate to the cloned directory: 
 cd capstone-bacck-end
@@ -348,6 +348,6 @@ DELETE FROM reports WHERE report_id = ${report_id};
 
 ## Front-End Repository
 
-Front-End Repository If you'd like to integrate the Back-End with the Front-End, you'll need to set up and run the Front-End server separately. The front-End repository for this project can be found at: [git@github.com:reggiecheston/capstone-front-end.git)(Code Beetle/Front-End Repo)
+Front-End Repository If you'd like to integrate the Back-End with the Front-End, you'll need to set up and run the Front-End server separately. The front-End repository for this project can be found at: git@github.com:reggiecheston/capstone-front-end.git
 
 Clone the backend repository and follow the instructions in its README to set up and run the backend server. Once the backend server is running, you can configure the frontend to communicate with it by updating the relevant configuration settings.
