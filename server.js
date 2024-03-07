@@ -141,26 +141,68 @@ app.post("/staff", async (req, res, next) => {
 // all 3 queries need to be run one after another
 
 
-function fetchTicketData(callback) {
-  const sql = `SELECT * FROM tickets AND reports`;
+function fetchReportData(callback) {
+  const sql = `SELECT * FROM reports`;
   database.query(sql, (error, result) => {
     if (error) {
       console.error(`Error fetching data: ${error}`);
       callback(error, null);
     } else {
-      let ticketData = result.map(ticket => ({
-        title: ticket.title,
-        summary: ticket.summary,
-        category: ticket.category,
-        priority: ticket.priority,
-        dueDate: ticket.dueDate
+      let ticketData = result.map(report => ({
+        title: report.title,
+        summary: report.summary,
+        category: report.category,
+        priority: report.priority,
+        dueDate: report.dueDate
       }));
       callback(null, ticketData);
     }
   });
 }
 
-app.post('/admin', (req, res) => {
+app.post('/reports', (req, res) => {
+  fetchReportData((error, ticketData) => {
+    if (error) {
+      res.status(500).send('Error fetching data from database');
+    } else {
+      res.json(ticketData);
+    }
+  });
+});
+
+app.get("/reports", (req, res) => {
+  fetchReportData((error, ticketData) => {
+    if (error) {
+      res.status(500).send('Error fetching data from database');
+    } else {
+      res.json(ticketData);
+    }
+  });
+});
+
+
+
+
+function fetchTicketData(callback) {
+  const sql = `SELECT * FROM tickets`;
+  database.query(sql, (error, result) => {
+    if (error) {
+      console.error(`Error fetching data: ${error}`);
+      callback(error, null);
+    } else {
+      let ticketData = result.map(report => ({
+        title: report.title,
+        summary: report.summary,
+        category: report.category,
+        priority: report.priority,
+        dueDate: report.dueDate
+      }));
+      callback(null, ticketData);
+    }
+  });
+}
+
+app.post('/tickets', (req, res) => {
   fetchTicketData((error, ticketData) => {
     if (error) {
       res.status(500).send('Error fetching data from database');
@@ -170,7 +212,7 @@ app.post('/admin', (req, res) => {
   });
 });
 
-app.get("/admin", (req, res) => {
+app.get("/ticket", (req, res) => {
   fetchTicketData((error, ticketData) => {
     if (error) {
       res.status(500).send('Error fetching data from database');
@@ -188,4 +230,4 @@ app.listen(4000, () => {
   console.log("Server is listening on port 4000.");
 });
 
-module.exports = fetchTicketData;
+// module.exports = fetchTicketData;
