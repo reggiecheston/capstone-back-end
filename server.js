@@ -18,10 +18,10 @@ app.get("/", (req, res) => {
   res.send("Home Page");
 });
 const database = mysql2.createConnection({
-  host: "database-1.c1suigess9hp.us-east-1.rds.amazonaws.com",
-  user: "admin",
-  password: "password",
-  database: "capstone_team_3",
+  host: "sql5.freemysqlhosting.net",
+  user: "sql5690210",
+  password: "qpPEZD1FEa",
+  database: "sql5690210"
 });
  
 database.connect((err) => {
