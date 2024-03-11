@@ -98,11 +98,11 @@ app.post("/staff", async (req, res, next) => {
   const summary = req.body.summary;
   const category = req.body.category.trim();
   const priority = req.body.priority;
-  const dueDate = req.body.dueDate;
+  const dueDate = req.body.due_date;
   const staffId = req.body.staff_id;
   try {
       const sql = `INSERT INTO reports (title, summary, category, priority, due_date, staff_id) VALUES 
-      ('${title}', '${summary}', '${category}', '${priority}', '${dueDate}', '7')`;
+      ('${title}', '${summary}', '${category}', '${priority}', '${dueDate}', '5')`;
       console.log(req.body);
       console.log(dueDate);
       database.query(sql, [req.body], async (error, result) => {
@@ -159,6 +159,10 @@ function fetchReportData(callback) {
     }
   });
 }
+
+// const sql = `INSERT INTO tickets (title, summary, category, size, priority, due_date, progress, isapproved, escalated, developer_assigned_id, staff_id, admin_assignor_id)
+//       VALUES ( '${title}', '${summary}', '${category}', "small", '${priority}', '${dueDate}', "not started", "0", "0", "1", "5", "3")`;
+
 
 app.post('/reports', (req, res) => {
   fetchReportData((error, ticketData) => {
