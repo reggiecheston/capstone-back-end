@@ -67,7 +67,7 @@ app.post("/login", async (req, res, next) => {
         const email = req.body.email;
         const password = req.body.password;
         // req.userId = user.userId;
-        // req.isAdmin = user.isAdmin;
+        //req.isAdmin = user.isAdmin;
         res.send({ message: "Logged in!", user: result });
         console.log("logged in");
         const role = `SELECT admin_id, developer_id FROM staff WHERE email = "${email}"`;
@@ -160,8 +160,74 @@ function fetchReportData(callback) {
   });
 }
 
+
+
 // const sql = `INSERT INTO tickets (title, summary, category, size, priority, due_date, progress, isapproved, escalated, developer_assigned_id, staff_id, admin_assignor_id)
-//       VALUES ( '${title}', '${summary}', '${category}', "small", '${priority}', '${dueDate}', "not started", "0", "0", "1", "5", "3")`;
+  //  VALUES ( '${title}', '${summary}', '${category}', "small", '${priority}', '${dueDate}', "not started", "0", "0", "1", "5", "3")`;
+
+
+function fetchUpdatedData(callback) {
+  console.log(req.body);
+  const title = req.body.title;
+  const summary = req.body.summary;
+  const category = req.body.category.trim();
+  const priority = req.body.priority;
+  const dueDate = req.body.due_date;
+  const staffId = req.body.staff_id;
+
+  const sql = `INSERT INTO tickets (title, summary, category, size, priority, due_date, progress, isapproved, escalated, developer_assigned_id, staff_id, admin_assignor_id)
+  VALUES ( '${title}', '${summary}', '${category}', "small", '${priority}', '${dueDate}', "not started", "0", "0", "1", "5", "3")`;
+
+  database.query(sql, (error, result) => {
+    if (error) {
+      console.error(`Error fetching data: ${error}`);
+      callback(error, null);
+    } else {
+      let updatedTicketData = result.map(report => ({
+        title: report.title,
+        summary: report.summary,
+        category: report.category,
+        priority: report.priority,
+        dueDate: report.dueDate
+      }));
+      callback(null, updatedTicketData);
+    }
+  });
+}
+
+// app.post('/updatedTickets', (req, res) => {
+//   fetchUpdatedData(req.body, (error, updatedTicketData) => {
+//     if (error) {
+//       res.status(500).send('Error fetching data from database');
+//     } else {
+//       res.json(updatedTicketData);
+//     }
+//   });
+// });
+
+app.post("/updatedTickets", async (req, res) => {
+  const { title, summary, category, priority, dueDate, staffId } = req.body;
+  try {
+   
+  const sql = `INSERT INTO tickets (title, summary, category, size, priority, due_date, progress, isapproved, escalated, developer_assigned_id, staff_id, admin_assignor_id)
+  VALUES ( '${title}', '${summary}', '${category}', "small", '${priority}', '${dueDate}', "not started", "0", "0", "1", "5", "3")`;
+    await database.query(sql, values);
+    res.json({ message: "Your report has been submitted" });
+  } catch (error) {
+    console.error("Error submitting report:", error);
+    res.status(500).send({ error: "Could not send report" });
+  }
+});
+
+app.get('/updatedTickets', (req, res) => {
+  fetchUpdatedData((error, updatedTicketData) => {
+    if (error) {
+      res.status(500).send('Error fetching data from database');
+    } else {
+      res.json(updatedTicketData);
+    }
+  });
+});
 
 
 app.post('/reports', (req, res) => {
@@ -206,6 +272,7 @@ function fetchTicketData(callback) {
   });
 }
 
+
 app.post('/tickets', (req, res) => {
   fetchTicketData((error, ticketData) => {
     if (error) {
@@ -234,4 +301,4 @@ app.listen(4000, () => {
   console.log("Server is listening on port 4000.");
 });
 
-// module.exports = fetchTicketData;
+module.exports = fetchUpdatedData;
